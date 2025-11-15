@@ -1,0 +1,36 @@
+{ 
+    "FeaturedProducts": [
+        { 
+            "id": 1,
+            "name": "Pull",
+            "price": "29.99",
+            "image": "/products/2g.png",
+            "category": "Hommes",
+            "badge": "Nouveau"
+        },
+        { 
+            "id": 2,
+            "name": "T-shirt",
+            "price": "9.99",
+            "image": "/products/4p.png",
+            "category": "Femmes",
+            "badge": "Nouveau"
+        },
+        { 
+            "id": 3,
+            "name": "Sneakers sport",
+            "price": "89.99",
+            "image": "/products/6g.png",
+            "category": "Chaussures",
+            "badge": "Promo"
+        },
+        { 
+            "id": 4,
+            "name": "Veste en jean",
+            "price": "39.99",
+            "image": "/products/8gr.png",
+            "category": "Hommes",
+            "badge": "Nouveau"
+        }
+    ]
+}
