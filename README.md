@@ -26,17 +26,19 @@ Voici l'ensemble des fonctionnalités prévues pour l'application.
 
 #### 🟨 Fonctionnalités prévues / En cours
 * **Fondamentaux E-commerce :** Liste des produits, affichage par catégories, filtres de recherche, et panier d'achat persistent.
-* **Authentification Sécurisée (RBAC) :** Système complet d'inscription et de connexion avec **Contrôle d'Accès Basé sur les Rôles** (distinction claire entre les rôles "Utilisateur" et "Administrateur").
 * **Intégration des Paiements :** Processus de paiement complet et sécurisé via `[Stripe / PayPal]` pour finaliser les commandes.
 * **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs permettant de :
     * Gérer l'inventaire (Créer, Lire, Mettre à jour, Supprimer les produits et catégories).
     * Visualiser et gérer les commandes des clients.
     * Gérer les comptes utilisateurs (ex: modifier les rôles, bannir).
-* **Profil Utilisateur :** Un espace personnel pour les utilisateurs, leur permettant de consulter leur historique de commandes et de gérer leurs informations personnelles.
+
 
 #### 🟩 Fonctionnalités terminées
-* N/A
-
+* **Authentification Sécurisée (RBAC) :** Système complet d'inscription et de connexion avec **Contrôle d'Accès Basé sur les Rôles** (distinction claire entre les rôles "Utilisateur" et "Administrateur").
+* * **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs. **
+* **Profil Utilisateur :** Un espace personnel pour les utilisateurs, leur permettant de consulter leur historique de commandes et de gérer leurs informations personnelles.
+  ![Statut](https://img.shields.io/badge/Statut-En%20cours%20de%20développement-yellow)
+  > **Attention :** La partie concernant la page des Users et le Dashboard des admins est en cours de développement 
 ---
 
 ### 👤 Auteur
