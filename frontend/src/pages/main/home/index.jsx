@@ -2,9 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, TrendingUp, Truck, Shield, Star } from 'lucide-react'
 
-// import components
-import Navbar from '../../../components/navbar/Navbar.jsx'
-import Footer from '../../../components/footer/Footer.jsx'
+
 
 function Home() {
   // Produits en vedette
@@ -64,7 +62,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
 
       {/* Hero Section */}
       <section className='relative w-screen h-[600px] overflow-hidden mt-44 px-6'>
@@ -242,7 +239,6 @@ function Home() {
         </div>
       </section>
 
-      <Footer />
     </div>
   )
 }

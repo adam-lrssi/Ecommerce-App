@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ShoppingCart, Bell, User, Menu, X } from 'lucide-react';
+import { Home, ShoppingCart, Bell, User, Menu, X, LogOut } from 'lucide-react';
 import SearchBar from './SearchBar';
+
+// Firebase
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
+
+  const { currentUser, logout } = useAuth(); //
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -18,6 +23,11 @@ const Navbar = () => {
   const closeSubmenu = () => {
     setOpenSubmenu(null);
   };
+
+  // Définit le lien de l'icône utilisateur et la fonction d'action
+  const userLink = currentUser && currentUser.userSlug
+    ? `/compte/${currentUser.userSlug}`
+    : '/compte/connexion'; const userAction = currentUser ? logout : null; //
 
   // Définition des sous-menus
   const submenus = {
@@ -78,9 +88,20 @@ const Navbar = () => {
           <Link to='/notifications' className='hover:text-gray-600 transition-colors'>
             <Bell className='text-gray-800 w-6 h-6'/>
           </Link>
-          <Link to='/login' className='hover:text-gray-600 transition-colors'>
+          <Link to={userLink} className='hover:text-gray-600 transition-colors'>
             <User className='text-gray-800 w-6 h-6'/>
           </Link>
+
+          {/* Bouton de DÉCONNEXION (Desktop) */}
+          {currentUser && (
+              <button 
+                  onClick={logout} 
+                  className='hover:text-red-500 transition-colors'
+                  aria-label="Déconnexion"
+              >
+                  <LogOut className='text-gray-800 w-6 h-6'/>
+              </button>
+          )}
         </div>
       </nav>
 
@@ -290,12 +311,23 @@ const Navbar = () => {
               <Bell className='text-gray-800 w-6 h-6'/>
             </Link>
             <Link 
-              to='/login' 
+              to={userLink} 
               onClick={toggleMenu}
               className='hover:text-gray-600 transition-colors'
             >
               <User className='text-gray-800 w-6 h-6'/>
             </Link>
+
+            {/* Bouton de DÉCONNEXION (Mobile) */}
+            {currentUser && (
+              <button 
+                onClick={() => { logout(); toggleMenu(); }} 
+                className='hover:text-red-500 transition-colors'
+                aria-label="Déconnexion"
+              >
+                <LogOut className='text-gray-800 w-6 h-6'/>
+              </button>
+            )}
           </div>
         </div>
       </div>
