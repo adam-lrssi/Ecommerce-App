@@ -37,7 +37,6 @@ Voici l'ensemble des fonctionnalités prévues pour l'application.
 * **Authentification Sécurisée (RBAC) :** Système complet d'inscription et de connexion avec **Contrôle d'Accès Basé sur les Rôles** (distinction claire entre les rôles "Utilisateur" et "Administrateur").
 * * **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs. **
 * **Profil Utilisateur :** Un espace personnel pour les utilisateurs, leur permettant de consulter leur historique de commandes et de gérer leurs informations personnelles.
-  ![Statut](https://img.shields.io/badge/Statut-En%20cours%20de%20développement-yellow)
   > **Attention :** La partie concernant la page des Users et le Dashboard des admins est en cours de développement 
 ---
 
