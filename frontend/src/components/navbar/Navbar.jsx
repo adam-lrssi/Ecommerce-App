@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Home, ShoppingCart, Bell, User, Menu, X, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+// Import des icônes de Lucide-React
+import { Home, ShoppingCart, Bell, User, Menu, X, LogOut, LayoutDashboard } from 'lucide-react'; 
 import SearchBar from './SearchBar';
 
 // Firebase
@@ -9,8 +10,24 @@ import { useAuth } from '../../context/AuthContext';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
+  const navigate = useNavigate();
 
-  const { currentUser, logout } = useAuth(); //
+  const { currentUser, logout } = useAuth(); 
+
+  // Détermine si l'utilisateur est admin
+  const isAdmin = currentUser && currentUser.role === 'admin'; 
+
+  // 🔑 NOUVELLE FONCTION DE DÉCONNEXION AVEC REDIRECTION
+  const handleLogout = async () => {
+      try {
+          await logout(); // Déconnexion Firebase
+          navigate('/'); // Redirection vers l'accueil
+      } catch (error) {
+          console.error("Erreur lors de la déconnexion:", error);
+          // Gérer les erreurs de déconnexion si nécessaire
+          navigate('/'); // Rediriger même en cas d'erreur pour vider l'interface
+      }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -24,10 +41,10 @@ const Navbar = () => {
     setOpenSubmenu(null);
   };
 
-  // Définit le lien de l'icône utilisateur et la fonction d'action
+  // Définit le lien de l'icône utilisateur : vers le profil avec slug si connecté, sinon vers la connexion
   const userLink = currentUser && currentUser.userSlug
     ? `/compte/${currentUser.userSlug}`
-    : '/compte/connexion'; const userAction = currentUser ? logout : null; //
+    : '/compte/connexion'; 
 
   // Définition des sous-menus
   const submenus = {
@@ -58,7 +75,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className='w-full absolute top-0'>
+    <header className='w-full absolute top-0 z-10'> {/* Ajout de z-10 pour s'assurer qu'elle est au-dessus du contenu */}
       {/* Barre de navigation principale */}
       <nav className='w-full flex justify-between items-center px-6 md:px-20 py-4 border-b border-gray-200 bg-white'>
         {/* LEFT - Logo */}
@@ -79,6 +96,14 @@ const Navbar = () => {
         {/* RIGHT - SearchBar et Icons - caché sur mobile */}
         <div className="hidden md:flex items-center gap-6">
           <SearchBar className="text-black" />
+          
+          {/* LIEN ADMIN CONDITIONNEL (Desktop) */}
+          {isAdmin && (
+            <Link to='/compte/admin/:userSlug' className='hover:text-gray-600 transition-colors' title="Tableau de Bord Admin">
+              <LayoutDashboard className='text-red-600 w-6 h-6'/>
+            </Link>
+          )}
+
           <Link to='/' className='hover:text-gray-100 transition-colors'>
             <Home className='text-gray-800 hover:text-gray-400 transition-colors w-6 h-6'/>
           </Link>
@@ -95,7 +120,7 @@ const Navbar = () => {
           {/* Bouton de DÉCONNEXION (Desktop) */}
           {currentUser && (
               <button 
-                  onClick={logout} 
+                  onClick={handleLogout} // 🔑 Utiliser la nouvelle fonction
                   className='hover:text-red-500 transition-colors'
                   aria-label="Déconnexion"
               >
@@ -289,6 +314,19 @@ const Navbar = () => {
 
           {/* Icons en bas */}
           <div className="flex gap-6 pt-6 border-t border-gray-200">
+            
+            {/* LIEN ADMIN CONDITIONNEL (Mobile) */}
+            {isAdmin && (
+              <Link 
+                to='/compte/admin/:userSlug' 
+                onClick={toggleMenu}
+                className='hover:text-gray-600 transition-colors'
+                title="Tableau de Bord Admin"
+              >
+                <LayoutDashboard className='text-red-600 w-6 h-6'/>
+              </Link>
+            )}
+            
             <Link 
               to='/' 
               onClick={toggleMenu}
@@ -321,7 +359,7 @@ const Navbar = () => {
             {/* Bouton de DÉCONNEXION (Mobile) */}
             {currentUser && (
               <button 
-                onClick={() => { logout(); toggleMenu(); }} 
+                onClick={() => { handleLogout(); toggleMenu(); }} // 🔑 Utiliser handleLogout
                 className='hover:text-red-500 transition-colors'
                 aria-label="Déconnexion"
               >

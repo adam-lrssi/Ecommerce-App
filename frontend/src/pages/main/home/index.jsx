@@ -66,7 +66,7 @@ function Home() {
       {/* Hero Section */}
       <section className='relative w-screen h-[600px] overflow-hidden mt-44 px-6'>
         <img 
-          src="../../public/featured.png" 
+          src="/featured.png" 
           alt="Show your style"
           className='w-full h-full object-cover'
         />

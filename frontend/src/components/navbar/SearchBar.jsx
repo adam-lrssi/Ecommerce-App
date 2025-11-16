@@ -3,14 +3,15 @@ import { Search } from 'lucide-react'
 
 function SearchBar() {
   return (
-    <div className="hidden md:flex items-center gap-2 rounded-md px-2 py-1 shadow-2">
-      <Search className="w-4 h-4 text-gray-500"/>
-      <input
-        className="placeholder:text-gray-500 placeholder:italic"
-        placeholder="Rechercher..."
-        type="text"
-        name="search"
-      />    
+    <div>
+      <div className="relative w-full max-w-sm ring-gray-500">
+        <input
+          type="text"
+          placeholder="Rechercher..."
+          className="w-full pl-10 pr-4 py-2 border  border-gray-500 rounded-2xl"
+        />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+      </div>
     </div>
   )
 }

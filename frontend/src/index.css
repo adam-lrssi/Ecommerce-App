@@ -17,7 +17,6 @@
 input {
   /* Force la couleur du texte saisi à être noir/gris foncé */
   color: #1a1a1a; 
-  border: none;
 }
 
 input:focus {

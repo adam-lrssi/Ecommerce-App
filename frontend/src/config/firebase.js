@@ -8,12 +8,12 @@ import { getStorage } from "firebase/storage";
 
 // 1. Récupération des variables d'environnement
 const firebaseConfig = {
-  apiKey: "AIzaSyA1-InLWr6Xl27b-qXQJW8s2MZ_ssTMCV8",
-  authDomain: "ecommerce-app-1fc3d.firebaseapp.com",
-  projectId: "ecommerce-app-1fc3d",
-  storageBucket: "ecommerce-app-1fc3d.firebasestorage.app",
-  messagingSenderId: "272949065346",
-  appId: "1:272949065346:web:c80dd4a7a7c8815fc7e69b"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // 2. Initialisation de l'application Firebase
