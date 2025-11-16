@@ -35,7 +35,7 @@ Voici l'ensemble des fonctionnalités prévues pour l'application.
 
 #### 🟩 Fonctionnalités terminées
 * **Authentification Sécurisée (RBAC) :** Système complet d'inscription et de connexion avec **Contrôle d'Accès Basé sur les Rôles** (distinction claire entre les rôles "Utilisateur" et "Administrateur").
-* * **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs. **
+* **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs. **
 * **Profil Utilisateur :** Un espace personnel pour les utilisateurs, leur permettant de consulter leur historique de commandes et de gérer leurs informations personnelles.
   > **Attention :** La partie concernant la page des Users et le Dashboard des admins est en cours de développement 
 ---
