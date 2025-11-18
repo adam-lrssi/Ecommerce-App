@@ -84,7 +84,7 @@ function Register() {
         userSlug: userSlug, // 🔑 STOCKAGE DU SLUG
         createdAt: new Date(),
         // Ajouter d'autres champs nécessaires pour l'e-commerce, par exemple :
-        role: 'customer', 
+        role: 'Client', 
         newsletter: false, 
       });
 

@@ -46,6 +46,11 @@ const Navbar = () => {
     ? `/compte/${currentUser.userSlug}`
     : '/compte/connexion'; 
 
+  const adminLink = currentUser && currentUser.userSlug
+    ? `/compte/admin/${currentUser.userSlug}`
+    : '/compte/connexion';
+  
+
   // Définition des sous-menus
   const submenus = {
     categories: [
@@ -99,7 +104,7 @@ const Navbar = () => {
           
           {/* LIEN ADMIN CONDITIONNEL (Desktop) */}
           {isAdmin && (
-            <Link to='/compte/admin/:userSlug' className='hover:text-gray-600 transition-colors' title="Tableau de Bord Admin">
+            <Link to={adminLink} className='hover:text-gray-600 transition-colors' title="Tableau de Bord Admin">
               <LayoutDashboard className='text-red-600 w-6 h-6'/>
             </Link>
           )}
