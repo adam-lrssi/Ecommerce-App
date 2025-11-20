@@ -33,7 +33,7 @@ Voici l'ensemble des fonctionnalités prévues pour l'application.
 #### 🟩 Fonctionnalités terminées
 * **Authentification Sécurisée (RBAC) :** Système complet d'inscription et de connexion avec **Contrôle d'Accès Basé sur les Rôles** (distinction claire entre les rôles "Utilisateur" et "Administrateur").
 * **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs. **
-*  * **Ajout des produits**
+   * **Ajout des produits**
    * **Affichage de la liste des porduits**
    * **Ajout des catégories**
    * **Gestion des commandes** -> Fictif pour le moment
