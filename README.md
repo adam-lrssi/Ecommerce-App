@@ -28,14 +28,16 @@ Voici l'ensemble des fonctionnalités prévues pour l'application.
 * **Fondamentaux E-commerce :** Liste des produits, affichage par catégories, filtres de recherche, et panier d'achat persistent.
 * **Intégration des Paiements :** Processus de paiement complet et sécurisé via `[Stripe / PayPal]` pour finaliser les commandes.
 * **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs permettant de :
-    * Gérer l'inventaire (Créer, Lire, Mettre à jour, Supprimer les produits et catégories).
     * Visualiser et gérer les commandes des clients.
-    * Gérer les comptes utilisateurs (ex: modifier les rôles, bannir).
-
 
 #### 🟩 Fonctionnalités terminées
 * **Authentification Sécurisée (RBAC) :** Système complet d'inscription et de connexion avec **Contrôle d'Accès Basé sur les Rôles** (distinction claire entre les rôles "Utilisateur" et "Administrateur").
 * **Panel d'Administration (Admin Panel) :** Un tableau de bord dédié et sécurisé pour les administrateurs. **
+*  * **Ajout des produits**
+   * **Affichage de la liste des porduits**
+   * **Ajout des catégories**
+   * **Gestion des commandes** -> Fictif pour le moment
+   * **Gestion des utilisateurs**
 * **Profil Utilisateur :** Un espace personnel pour les utilisateurs, leur permettant de consulter leur historique de commandes et de gérer leurs informations personnelles.
   > **Attention :** La partie concernant la page des Users et le Dashboard des admins est en cours de développement 
 ---
