@@ -13,8 +13,7 @@ Ce dépôt contient le code source d'une application e-commerce full-stack moder
 Ce projet est construit avec les technologies suivantes :
 
 * **Front-End :** `React Js / Tailwind css `
-* **Back-End :** `Node.Js / Express.Js`
-* **Base de données :** `PostgreSQL`
+* **Base de données :** `Firebase -> FireStore`
 * **Paiements :** `Stripe`
 * **Authentification :** `FireBase`
 
