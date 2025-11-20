@@ -23,6 +23,7 @@ import AdminIndex from '../pages/admin/Outlet/AdminIndex.jsx'
 import AdminOrdersPage from "../pages/admin/Outlet/Commandes.jsx";
 import AdminUsersPage from "../pages/admin/Outlet/AdminUser.jsx";
 
+import AdminCategories from "../pages/admin/Outlet/AdminCategories.jsx";
 import AdminProductsPage from '../pages/admin/Outlet/AdminProducts.jsx';
 import AdminAddProductPage from '../pages/admin/Outlet/AdminAddProducts.jsx'
 
@@ -59,6 +60,8 @@ function RouterApp() {
 
                     <Route path="produits" element={<AdminProductsPage />} />
                     <Route path="produits/ajouter" element={<AdminAddProductPage />} />
+
+                    <Route path="categories" element={<AdminCategories />} />
                 </Route>
 
                 

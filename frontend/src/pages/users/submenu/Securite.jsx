@@ -5,9 +5,11 @@ import { useAuth } from '../../../context/AuthContext';
 
 // 🔑 Assurez-vous d'importer les outils Firebase nécessaires
 // (Normalement, vous les importeriez depuis votre configuration Firebase)
-// Ex: import { auth, db } from '../config/firebase'; 
-// Ex: import { updatePassword, updateEmail } from 'firebase/auth';
-// Ex: import { doc, updateDoc } from 'firebase/firestore'; 
+import { auth, db } from '../../../config/firebase'; 
+
+import { updatePassword, updateEmail } from 'firebase/auth';
+
+import { doc, updateDoc } from 'firebase/firestore'; 
 
 // *** NOTE IMPORTANTE SUR LA SÉCURITÉ ***
 // Les fonctions `updatePassword` et `updateEmail` de Firebase exigent que l'utilisateur 
@@ -59,12 +61,11 @@ function SecurityPage() {
         setError('');
         setMessage('');
 
-        // 🔑 Logique Firestore : Remplacer par votre logique `updateDoc`
         try {
-            // Exemple : docRef = doc(db, "users", currentUser.uid);
-            // await updateDoc(docRef, personalInfo); 
+            const docRef = doc(db, "users", currentUser.uid);
+            await updateDoc(docRef, personalInfo); 
 
-            console.log("Mise à jour Firestore simulée :", personalInfo);
+            console.log("Mise a jour du profil fait : ", personalInfo);
             setMessage("Informations personnelles mises à jour avec succès !");
             
         } catch (err) {
@@ -165,6 +166,7 @@ function SecurityPage() {
                             type="tel"
                             name="phone"
                             id="phone"
+                            size={10}
                             value={personalInfo.phone}
                             onChange={handlePersonalInfoChange}
                             className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2"

@@ -1,41 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Plus, DollarSign, Image as ImageIcon, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 // 🔑 Imports Firebase
-import { collection, addDoc } from 'firebase/firestore'; 
+import { collection, addDoc, getDocs, doc, setDoc } from 'firebase/firestore'; // setDoc pour garantir l'ID généré
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-// Assurez-vous d'importer 'db' (Firestore) et 'storage' (Storage) depuis votre fichier de configuration
 import { db, storage } from '../../../config/firebase'; 
 
-// Catégories factices
-const mockCategories = [
-    'Sélectionnez une catégorie', 
-    'T-Shirts', 
-    'Pantalons', 
-    'Accessoires', 
-    'Chaussures', 
-    'Vêtements d\'extérieur'
-];
 
 function AdminAddProductPage() {
     const navigate = useNavigate();
+    
+    // --- 1. États pour les données et le chargement ---
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        price: '',
+        prix: '',
         stock: '',
-        category: mockCategories[0],
+        parentCategoryId: '', // ID du parent sélectionné (Niveau 1)
+        subCategoryId: '',    // ID de l'enfant sélectionné (Optionnel)
         sku: '',
     });
     const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
+    
+    // État pour stocker toutes les catégories
+    const [allCategories, setAllCategories] = useState([]); 
+    const [categoriesLoading, setCategoriesLoading] = useState(true); 
+
+    // --- UTILS : Génération de slug simple ---
+    const slugify = (text) => {
+        return text.toString().toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '').replace(/--+/g, '-');
+    };
+
+
+    // --- 2. LOGIQUE DE CHARGEMENT DES CATÉGORIES ---
+    useEffect(() => {
+        const fetchCategories = async () => {
+            setCategoriesLoading(true);
+            try {
+                const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+                const categoryList = categoriesSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setAllCategories(categoryList);
+            } catch (err) {
+                console.error("Erreur de chargement des catégories:", err);
+                setError("Impossible de charger les catégories.");
+            } finally {
+                setCategoriesLoading(false);
+            }
+        };
+        fetchCategories();
+    }, []);
+    // ----------------------------------------------------
+
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
         setError('');
+        
+        // Logique spécifique : Si le parent change, réinitialiser la sous-catégorie
+        if (name === 'parentCategoryId') {
+            setFormData(prev => ({ 
+                ...prev, 
+                parentCategoryId: value, 
+                subCategoryId: '' // Réinitialiser l'enfant
+            }));
+        }
     };
     
     const handleImageChange = (e) => {
@@ -44,56 +80,84 @@ function AdminAddProductPage() {
         }
     };
 
-    // --- LOGIQUE DE SAUVEGARDE (CLÉ) ---
+    // --- 3. LOGIQUE DE SAUVEGARDE (CLÉ) ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setMessage('');
         setLoading(true);
 
-        if (!imageFile || formData.category === mockCategories[0] || !formData.name.trim()) {
-            setError("Veuillez remplir les champs obligatoires (Nom, Catégorie, Image).");
+        if (!formData.name.trim() || !formData.parentCategoryId) {
+            setError("Veuillez remplir le nom et sélectionner une catégorie principale.");
             setLoading(false); 
             return;
         }
 
         try {
-            // 1. TÉLÉCHARGEMENT DE L'IMAGE VERS FIREBASE STORAGE
-            const fileName = `${formData.sku || formData.name}-${Date.now()}`;
-            // Utilisation d'un chemin simple pour maximiser la compatibilité
-            const imageRef = ref(storage, `products/${fileName}`); 
-            await uploadBytes(imageRef, imageFile);
-            const imageUrl = await getDownloadURL(imageRef);
+            // 1. PRÉ-GÉNÉRER LA RÉFÉRENCE ET L'ID DU DOCUMENT
+            const productsCollectionRef = collection(db, 'products');
+            const newProductRef = doc(productsCollectionRef); // Obtient la référence avec un ID unique
+            const generatedSKU = 'PROD-' + newProductRef.id.substring(0, 8).toUpperCase(); 
+            
+            let imageUrl = '';
+            
+            // 2. TÉLÉCHARGEMENT DE L'IMAGE VERS FIREBASE STORAGE
+            if (imageFile) {
+                const fileName = `${generatedSKU}-${Date.now()}`;
+                const imageRef = ref(storage, `products/${fileName}`); 
+                await uploadBytes(imageRef, imageFile);
+                imageUrl = await getDownloadURL(imageRef);
+            }
 
-            // 2. SAUVEGARDE DES DONNÉES DANS FIRESTORE
+            // 3. PRÉPARATION DES DONNÉES FIRESTORE
+            const finalCategoryId = formData.subCategoryId || formData.parentCategoryId;
+            const finalCategory = allCategories.find(cat => cat.id === finalCategoryId);
+            
             const productData = {
-                ...formData, 
-                price: parseFloat(formData.price),
+                ...formData,
+                prix: parseFloat(formData.prix),
                 stock: parseInt(formData.stock, 10),
-                imageUrl: imageUrl,
+                imageUrl: imageUrl || null, 
+                
+                // 🔑 LIEN DE LA CATÉGORIE FINALE SAUVEGARDÉE
+                category_id: finalCategoryId,
+                category_name: finalCategory ? finalCategory.name : 'Non classé',
+                
+                // 🔑 SKU et ID du document
+                sku: generatedSKU,
+                id: newProductRef.id, 
+                
                 createdAt: new Date(),
                 isAvailable: true, 
             };
 
-            // Crée la collection 'products' si elle n'existe pas et ajoute le document
-            await addDoc(collection(db, 'products'), productData); 
+            // 4. SAUVEGARDE DANS FIRESTORE AVEC setDoc (utilise l'ID pré-généré)
+            await setDoc(newProductRef, productData); 
 
             setMessage("Produit ajouté avec succès ! Redirection en cours...");
             
             // Réinitialisation et redirection
-            setFormData({ name: '', description: '', price: '', stock: '', category: mockCategories[0], sku: '' });
+            setFormData({ name: '', description: '', prix: '', stock: '', parentCategoryId: '', subCategoryId: '', sku: '' });
             setImageFile(null);
             setTimeout(() => navigate(-1), 1500); 
 
         } catch (err) {
             console.error("Erreur FATALE lors de l'ajout du produit:", err);
-            // Si l'erreur persiste, c'est que les règles de sécurité de Storage ou Firestore bloquent l'écriture.
-            setError(`Erreur : Échec de la sauvegarde. Vérifiez les règles de sécurité. Détails: ${err.message}`); 
+            setError(`Erreur : Échec de la sauvegarde. Détails: ${err.message}`); 
         } finally {
             setLoading(false); 
         }
     };
-    // ----------------------------------------
+
+    // --- 4. LOGIQUE DE FILTRAGE DES CATÉGORIES POUR LE JSX ---
+    const parentCategories = allCategories.filter(cat => !cat.parentId);
+    const subCategories = allCategories.filter(cat => cat.parentId === formData.parentCategoryId);
+    
+    
+    // Affichage du chargement si les catégories ne sont pas encore chargées
+    if (categoriesLoading) {
+        return <div className="p-10 text-center"><Loader2 className="w-6 h-6 animate-spin text-gray-500 mx-auto" /> Chargement des catégories...</div>;
+    }
 
     return (
         <div className="p-6 bg-white rounded-xl shadow-lg min-h-[80vh]">
@@ -140,9 +204,9 @@ function AdminAddProductPage() {
                         {/* Prix, Stock, SKU */}
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label htmlFor="price" className="block text-sm font-medium text-gray-700">Prix (€)</label>
+                                <label htmlFor="prix" className="block text-sm font-medium text-gray-700">Prix (€)</label>
                                 <div className="relative mt-1">
-                                    <input type="number" name="price" id="price" value={formData.price} onChange={handleChange} required className="block w-full border border-gray-300 rounded-lg shadow-sm p-2 pl-8 focus:ring-indigo-500 focus:border-indigo-500" min="0.01" step="0.01" />
+                                    <input type="number" name="prix" id="prix" value={formData.prix} onChange={handleChange} required className="block w-full border border-gray-300 rounded-lg shadow-sm p-2 pl-8 focus:ring-indigo-500 focus:border-indigo-500" min="0.01" step="0.01" />
                                     <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 </div>
                             </div>
@@ -150,30 +214,55 @@ function AdminAddProductPage() {
                                 <label htmlFor="stock" className="block text-sm font-medium text-gray-700">Stock Initial</label>
                                 <input type="number" name="stock" id="stock" value={formData.stock} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" min="0" />
                             </div>
+                            
+                            {/* 🔑 EMPLACEMENT SKU : Désactivé car auto-généré */}
                             <div>
                                 <label htmlFor="sku" className="block text-sm font-medium text-gray-700">SKU / Référence</label>
-                                <input type="text" name="sku" id="sku" value={formData.sku} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                                <input type="text" disabled value="Auto-Généré" className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 bg-gray-200 text-gray-600 cursor-not-allowed" />
                             </div>
                         </div>
 
-                        {/* Catégorie */}
-                        <div>
-                            <label htmlFor="category" className="block text-sm font-medium text-gray-700">Catégorie</label>
-                            <select name="category" id="category" value={formData.category} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none text-gray-900">
-                                {mockCategories.map(cat => (
-                                    <option key={cat} value={cat} disabled={cat === mockCategories[0]}>{cat}</option>
-                                ))}
-                            </select>
+                        {/* 🔑 SÉLECTION DE CATÉGORIE HIÉRARCHIQUE */}
+                        <div className="grid grid-cols-2 gap-4">
+                            
+                            {/* 1. CATÉGORIE PARENT (Obligatoire) */}
+                            <div>
+                                <label htmlFor="parentCategoryId" className="block text-sm font-medium text-gray-700">Catégorie Principale</label>
+                                <select name="parentCategoryId" id="parentCategoryId" value={formData.parentCategoryId} onChange={handleChange} required className="text-gray-900 appearance-none mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="" disabled>-- Sélectionner un Parent --</option>
+                                    {parentCategories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            {/* 2. SOUS-CATÉGORIE (Optionnelle et dépendante du parent) */}
+                            <div>
+                                <label htmlFor="subCategoryId" className="block text-sm font-medium text-gray-700">Sous-catégorie (Optionnel)</label>
+                                <select 
+                                    name="subCategoryId" 
+                                    id="subCategoryId" 
+                                    value={formData.subCategoryId} 
+                                    onChange={handleChange} 
+                                    disabled={!formData.parentCategoryId || subCategories.length === 0}
+                                    className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900 appearance-none"
+                                >
+                                    <option value="">-- Non spécifié --</option>
+                                    {subCategories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     {/* Colonne 3: Téléchargement d'Image */}
                     <div className="lg:col-span-1 space-y-4 bg-white p-6 rounded-lg border shadow-sm">
                         <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 border-b pb-2">
-                            <ImageIcon className="w-5 h-5"/> Média
+                            <ImageIcon className="w-5 h-5"/> Média (Optionnel)
                         </h3>
                         
-                        <input type="file" onChange={handleImageChange} required className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
+                        <input type="file" onChange={handleImageChange} accept="image/png, image/jpeg, image/webp" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
                         
                         {/* Aperçu de l'image sélectionnée */}
                         {imageFile && (
@@ -205,7 +294,7 @@ function AdminAddProductPage() {
                 </button>
             </form>
         </div>
-    );
+    )
 }
 
 export default AdminAddProductPage;
